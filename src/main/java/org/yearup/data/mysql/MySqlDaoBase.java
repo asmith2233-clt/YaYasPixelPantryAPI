@@ -17,4 +17,8 @@ public abstract class MySqlDaoBase
     {
         return dataSource.getConnection();
     }
+
+    public abstract void updateProduct(int userId, int productId, int quantity);
+
+    public abstract void removeProduct(int userId, int productId);
 }

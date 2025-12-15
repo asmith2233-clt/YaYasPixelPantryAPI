@@ -20,6 +20,16 @@ public class MySqlUserDao extends MySqlDaoBase implements UserDao
         super(dataSource);
     }
 
+    @Override
+    public void updateProduct(int userId, int productId, int quantity) {
+
+    }
+
+    @Override
+    public void removeProduct(int userId, int productId) {
+
+    }
+
 
     @Override
     public User create(User newUser)
@@ -144,6 +154,11 @@ public class MySqlUserDao extends MySqlDaoBase implements UserDao
     {
         User user = getByUserName(username);
         return user != null;
+    }
+
+    @Override
+    public User getByUsername(String name) {
+        return null;
     }
 
     private User mapRow(ResultSet row) throws SQLException

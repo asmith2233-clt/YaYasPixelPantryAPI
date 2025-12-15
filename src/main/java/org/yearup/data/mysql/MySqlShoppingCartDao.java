@@ -1,6 +1,7 @@
 package org.yearup.data.mysql;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+import org.yearup.data.ShoppingCartDao;
 import org.yearup.models.Product;
 import org.yearup.models.ShoppingCart;
 import org.yearup.models.ShoppingCartItem;
@@ -10,31 +11,14 @@ import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.yearup.models.ShoppingCart;
-
-public interface ShoppingCartDao
-{
-    ShoppingCart getByUserId(int userId);
-
-    void addProduct(int userId, int productId);
-
-    void updateProduct(int userId, int productId, int quantity);
-
-    void removeProduct(int userId, int productId);
-
-    void clearCart(int userId);
-}
-
-
-@Component
-class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDao
+@Repository
+public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDao
 {
     public MySqlShoppingCartDao(DataSource dataSource)
     {
         super(dataSource);
     }
 
-    // 🛒 GET CART BY USER ID
     @Override
     public ShoppingCart getByUserId(int userId)
     {
@@ -51,15 +35,15 @@ class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDao
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, userId);
 
-            ResultSet row = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
-            while (row.next())
+            while (rs.next())
             {
-                Product product = mapProduct(row);
-                int quantity = row.getInt("quantity");
+                Product product = mapProduct(rs);
+                int quantity = rs.getInt("quantity");
 
-                ShoppingCartItem item = new ShoppingCartItem(product, quantity);
-                items.put(product.getProductId(), item);
+                items.put(product.getProductId(),
+                        new ShoppingCartItem(product, quantity));
             }
         }
         catch (SQLException e)
@@ -70,39 +54,20 @@ class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDao
         return new ShoppingCart(userId, items);
     }
 
-    // ➕ ADD PRODUCT (OR INCREMENT QUANTITY)
     @Override
     public void addProduct(int userId, int productId)
     {
-        String checkSql =
-                "SELECT quantity FROM shopping_cart WHERE user_id = ? AND product_id = ?";
-        String insertSql =
-                "INSERT INTO shopping_cart (user_id, product_id, quantity) VALUES (?, ?, 1)";
-        String updateSql =
-                "UPDATE shopping_cart SET quantity = quantity + 1 WHERE user_id = ? AND product_id = ?";
+        String sql =
+                "INSERT INTO shopping_cart (user_id, product_id, quantity) " +
+                        "VALUES (?, ?, 1) " +
+                        "ON DUPLICATE KEY UPDATE quantity = quantity + 1";
 
         try (Connection connection = getConnection())
         {
-            PreparedStatement check = connection.prepareStatement(checkSql);
-            check.setInt(1, userId);
-            check.setInt(2, productId);
-
-            ResultSet rs = check.executeQuery();
-
-            if (rs.next())
-            {
-                PreparedStatement update = connection.prepareStatement(updateSql);
-                update.setInt(1, userId);
-                update.setInt(2, productId);
-                update.executeUpdate();
-            }
-            else
-            {
-                PreparedStatement insert = connection.prepareStatement(insertSql);
-                insert.setInt(1, userId);
-                insert.setInt(2, productId);
-                insert.executeUpdate();
-            }
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, userId);
+            ps.setInt(2, productId);
+            ps.executeUpdate();
         }
         catch (SQLException e)
         {
@@ -110,7 +75,11 @@ class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDao
         }
     }
 
-    // 🔁 UPDATE PRODUCT QUANTITY
+    @Override
+    public void updateQuantity(int userId, int productId, int quantity) {
+
+    }
+
     @Override
     public void updateProduct(int userId, int productId, int quantity)
     {
@@ -137,7 +106,6 @@ class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDao
         }
     }
 
-    // ❌ REMOVE SINGLE PRODUCT
     @Override
     public void removeProduct(int userId, int productId)
     {
@@ -157,7 +125,6 @@ class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDao
         }
     }
 
-    // 🧹 CLEAR CART
     @Override
     public void clearCart(int userId)
     {
@@ -176,7 +143,6 @@ class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDao
         }
     }
 
-    // 🔧 MAP PRODUCT FROM RESULT SET
     private Product mapProduct(ResultSet row) throws SQLException
     {
         return new Product(

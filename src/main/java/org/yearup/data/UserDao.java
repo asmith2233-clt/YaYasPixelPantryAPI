@@ -17,4 +17,6 @@ public interface UserDao {
     User create(User user);
 
     boolean exists(String username);
+
+    User getByUsername(String name);
 }

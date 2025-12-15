@@ -16,6 +16,16 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
     }
 
     @Override
+    public void updateProduct(int userId, int productId, int quantity) {
+
+    }
+
+    @Override
+    public void removeProduct(int userId, int productId) {
+
+    }
+
+    @Override
     public Profile create(Profile profile)
     {
         String sql = "INSERT INTO profiles (user_id, first_name, last_name, phone, email, address, city, state, zip) " +

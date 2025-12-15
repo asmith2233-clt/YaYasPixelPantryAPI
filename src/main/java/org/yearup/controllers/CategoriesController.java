@@ -27,14 +27,14 @@ public class CategoriesController
         this.productDao = productDao;
     }
 
-    // 🔹 GET all categories
+    // GET http://localhost:8080/categories
     @GetMapping
     @PreAuthorize("permitAll()")
     public List<Category> getAll()
     {
         try
         {
-            return categoryDao.getAll();
+            return categoryDao.getAllCategories();
         }
         catch (Exception ex)
         {
@@ -45,7 +45,7 @@ public class CategoriesController
         }
     }
 
-    // 🔹 GET category by ID
+    // GET http://localhost:8080/categories/{id}
     @GetMapping("/{id}")
     @PreAuthorize("permitAll()")
     public Category getById(@PathVariable int id)
@@ -55,7 +55,9 @@ public class CategoriesController
             Category category = categoryDao.getById(id);
 
             if (category == null)
+            {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found");
+            }
 
             return category;
         }
@@ -72,14 +74,15 @@ public class CategoriesController
         }
     }
 
-    // 🔹 GET products by category ID
+    // GET http://localhost:8080/categories/{categoryId}/products
     @GetMapping("/{categoryId}/products")
     @PreAuthorize("permitAll()")
     public List<Product> getProductsByCategory(@PathVariable int categoryId)
     {
         try
         {
-            return productDao.getByCategoryId(categoryId);
+            // IMPORTANT: this should match your DAO method name
+            return productDao.listByCategoryId(categoryId);
         }
         catch (Exception ex)
         {
@@ -90,7 +93,7 @@ public class CategoriesController
         }
     }
 
-    // 🔒 POST new category (ADMIN ONLY)
+    // POST http://localhost:8080/categories  (ADMIN ONLY)
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
@@ -109,7 +112,7 @@ public class CategoriesController
         }
     }
 
-    // 🔒 PUT update category (ADMIN ONLY)
+    // PUT http://localhost:8080/categories/{id}  (ADMIN ONLY)
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -118,9 +121,10 @@ public class CategoriesController
         try
         {
             Category existing = categoryDao.getById(id);
-
             if (existing == null)
+            {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found");
+            }
 
             categoryDao.update(id, category);
         }
@@ -137,7 +141,7 @@ public class CategoriesController
         }
     }
 
-    // 🔒 DELETE category (ADMIN ONLY)
+    // DELETE http://localhost:8080/categories/{id}  (ADMIN ONLY)
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -146,9 +150,10 @@ public class CategoriesController
         try
         {
             Category existing = categoryDao.getById(id);
-
             if (existing == null)
+            {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found");
+            }
 
             categoryDao.delete(id);
         }
@@ -165,4 +170,5 @@ public class CategoriesController
         }
     }
 }
+
 
