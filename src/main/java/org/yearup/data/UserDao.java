@@ -14,6 +14,8 @@ public interface UserDao {
 
     int getIdByUsername(String username);
 
+    void updateProduct(int userId, int productId, int quantity);
+
     User create(User user);
 
     boolean exists(String username);

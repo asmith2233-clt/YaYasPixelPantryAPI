@@ -7,6 +7,8 @@ import org.yearup.data.ProfileDao;
 import javax.sql.DataSource;
 import java.sql.*;
 
+import static java.sql.DriverManager.getConnection;
+
 @Component
 public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
 {
@@ -52,6 +54,10 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
         {
             throw new RuntimeException(e);
         }
+    }
+
+    private Connection getConnection() {
+        return null;
     }
 
 }

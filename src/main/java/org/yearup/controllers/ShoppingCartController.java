@@ -1,6 +1,7 @@
 package org.yearup.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.yearup.data.ProductDao;
@@ -13,71 +14,64 @@ import org.yearup.models.ShoppingCartItem;
 import org.yearup.models.User;
 
 import java.security.Principal;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/cart")
+@CrossOrigin
 @PreAuthorize("isAuthenticated()")
 public class ShoppingCartController
 {
     private final ShoppingCartDao shoppingCartDao;
     private final UserDao userDao;
-    private final ProfileDao profileDao;
-    private ProductDao productDao;
 
     @Autowired
-    public ShoppingCartController(
-            ShoppingCartDao shoppingCartDao,
-            UserDao userDao, ProfileDao profileDao)
+    public ShoppingCartController(ShoppingCartDao shoppingCartDao, UserDao userDao)
     {
         this.shoppingCartDao = shoppingCartDao;
         this.userDao = userDao;
-        this.profileDao = profileDao;
     }
 
-    // GET /cart
+    // ✅ GET /cart
     @GetMapping
-    public ShoppingCart getCart(Principal principal) {
-        User user = userDao.getByUsername(principal.getName());
-        ShoppingCart cart = shoppingCartDao.getByUserId(user.getId());
+    public ShoppingCart getCart(Principal principal)
+    {
+        String username = principal.getName();
+        int userId = userDao.getIdByUsername(username);
 
-        for (ShoppingCartItem item : cart.getItems().values())
-        {
-
-            Product product = productDao.getById(item.getProductId());
-            item.setProduct(product);
-        }
-
-        return cart;
+        return shoppingCartDao.getByUserId(userId);
     }
-    // POST /cart/products/{productId}
+
+    // ✅ POST /cart/products/{id}
     @PostMapping("/products/{productId}")
-    public void addProductToCart(
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addProduct(
             @PathVariable int productId,
             Principal principal)
     {
-        User user = userDao.getByUsername(principal.getName());
-        shoppingCartDao.addProduct(user.getId(), productId);
+        int userId = userDao.getIdByUsername(principal.getName());
+        shoppingCartDao.addProduct(userId, productId);
     }
 
-    // PUT /cart/products/{productId}
+    // ✅ PUT /cart/products/{id}
     @PutMapping("/products/{productId}")
-    public void updateProductQuantity(
+    public void updateQuantity(
             @PathVariable int productId,
-            @RequestBody ShoppingCartItem item,
+            @RequestBody Map<String, Integer> body,
             Principal principal)
     {
-        User user = userDao.getByUsername(principal.getName());
-        shoppingCartDao.updateQuantity(
-                user.getId(),
-                productId,
-                item.getQuantity());
+        int quantity = body.get("quantity");
+        int userId = userDao.getIdByUsername(principal.getName());
+
+        shoppingCartDao.updateQuantity(userId, productId, quantity);
     }
 
-    // DELETE /cart
+    // ✅ DELETE /cart
     @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void clearCart(Principal principal)
     {
-        User user = userDao.getByUsername(principal.getName());
-        shoppingCartDao.clearCart(user.getId());
+        int userId = userDao.getIdByUsername(principal.getName());
+        shoppingCartDao.clearCart(userId);
     }
 }

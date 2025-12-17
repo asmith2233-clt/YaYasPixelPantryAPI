@@ -11,6 +11,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.sql.DriverManager.getConnection;
+
 @Component
 public class MySqlUserDao extends MySqlDaoBase implements UserDao
 {
@@ -56,6 +58,10 @@ public class MySqlUserDao extends MySqlDaoBase implements UserDao
         {
             throw new RuntimeException(e);
         }
+    }
+
+    private Connection getConnection() {
+        return null;
     }
 
     @Override

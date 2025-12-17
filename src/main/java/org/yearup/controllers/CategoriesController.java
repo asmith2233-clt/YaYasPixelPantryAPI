@@ -32,46 +32,22 @@ public class CategoriesController
     @PreAuthorize("permitAll()")
     public List<Category> getAll()
     {
-        try
-        {
-            return categoryDao.getAllCategories();
-        }
-        catch (Exception ex)
-        {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Unable to retrieve categories"
-            );
-        }
+        return categoryDao.getAllCategories();
     }
 
-    // GET http://localhost:8080/categories/{id}
+    // ✅ GET http://localhost:8080/categories/{id}
     @GetMapping("/{id}")
     @PreAuthorize("permitAll()")
     public Category getById(@PathVariable int id)
     {
-        try
-        {
-            Category category = categoryDao.getById(id);
+        Category category = categoryDao.getById(id);
 
-            if (category == null)
-            {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found");
-            }
+        if (category == null)
+        {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
 
-            return category;
-        }
-        catch (ResponseStatusException ex)
-        {
-            throw ex;
-        }
-        catch (Exception ex)
-        {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Unable to retrieve category"
-            );
-        }
+        return category;
     }
 
     // GET http://localhost:8080/categories/{categoryId}/products
@@ -79,18 +55,7 @@ public class CategoriesController
     @PreAuthorize("permitAll()")
     public List<Product> getProductsByCategory(@PathVariable int categoryId)
     {
-        try
-        {
-            // IMPORTANT: this should match your DAO method name
-            return productDao.listByCategoryId(categoryId);
-        }
-        catch (Exception ex)
-        {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Unable to retrieve products for category"
-            );
-        }
+        return productDao.listByCategoryId(categoryId);
     }
 
     // POST http://localhost:8080/categories  (ADMIN ONLY)
@@ -99,17 +64,7 @@ public class CategoriesController
     @ResponseStatus(HttpStatus.CREATED)
     public Category addCategory(@RequestBody Category category)
     {
-        try
-        {
-            return categoryDao.create(category);
-        }
-        catch (Exception ex)
-        {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Unable to create category"
-            );
-        }
+        return categoryDao.create(category);
     }
 
     // PUT http://localhost:8080/categories/{id}  (ADMIN ONLY)
@@ -118,27 +73,13 @@ public class CategoriesController
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateCategory(@PathVariable int id, @RequestBody Category category)
     {
-        try
+        Category existing = categoryDao.getById(id);
+        if (existing == null)
         {
-            Category existing = categoryDao.getById(id);
-            if (existing == null)
-            {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found");
-            }
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
 
-            categoryDao.update(id, category);
-        }
-        catch (ResponseStatusException ex)
-        {
-            throw ex;
-        }
-        catch (Exception ex)
-        {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Unable to update category"
-            );
-        }
+        categoryDao.update(id, category);
     }
 
     // DELETE http://localhost:8080/categories/{id}  (ADMIN ONLY)
@@ -147,28 +88,12 @@ public class CategoriesController
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable int id)
     {
-        try
+        Category existing = categoryDao.getById(id);
+        if (existing == null)
         {
-            Category existing = categoryDao.getById(id);
-            if (existing == null)
-            {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found");
-            }
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
 
-            categoryDao.delete(id);
-        }
-        catch (ResponseStatusException ex)
-        {
-            throw ex;
-        }
-        catch (Exception ex)
-        {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Unable to delete category"
-            );
-        }
+        categoryDao.delete(id);
     }
 }
-
-
