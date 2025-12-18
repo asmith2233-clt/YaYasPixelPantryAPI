@@ -50,10 +50,6 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao
         return categories;
     }
 
-    private Connection getConnection() {
-        return null;
-    }
-
     @Override
     public Category getById(int categoryId)
     {

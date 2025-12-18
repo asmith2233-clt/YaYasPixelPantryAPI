@@ -60,7 +60,7 @@ public class MySqlUserDao extends MySqlDaoBase implements UserDao
         }
     }
 
-    private Connection getConnection() {
+    public Connection getConnection() {
         return null;
     }
 

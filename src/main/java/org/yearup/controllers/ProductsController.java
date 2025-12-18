@@ -28,23 +28,13 @@ public class ProductsController
     @GetMapping
     @PreAuthorize("permitAll()")
     public List<Product> search(
-            @RequestParam(name = "cat", required = false) Integer categoryId,
+            @RequestParam(required = false) Integer categoryId,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(required = false) String subCategory
+            @RequestParam(name = "subcategory", required = false) String subCategory
     )
     {
-        try
-        {
-            return productDao.search(categoryId, minPrice, maxPrice, subCategory);
-        }
-        catch (Exception ex)
-        {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Unable to search products"
-            );
-        }
+        return productDao.search(categoryId, minPrice, maxPrice, subCategory);
     }
 
     // 🔎 GET PRODUCT BY ID (PUBLIC)
@@ -52,31 +42,14 @@ public class ProductsController
     @PreAuthorize("permitAll()")
     public Product getById(@PathVariable int id)
     {
-        try
-        {
-            Product product = productDao.getById(id);
+        Product product = productDao.getById(id);
 
-            if (product == null)
-            {
-                throw new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Product not found"
-                );
-            }
+        if (product == null)
+        {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
 
-            return product;
-        }
-        catch (ResponseStatusException ex)
-        {
-            throw ex;
-        }
-        catch (Exception ex)
-        {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Unable to retrieve product"
-            );
-        }
+        return product;
     }
 
     // 🔒 ADD PRODUCT (ADMIN ONLY)
@@ -85,17 +58,7 @@ public class ProductsController
     @ResponseStatus(HttpStatus.CREATED)
     public Product addProduct(@RequestBody Product product)
     {
-        try
-        {
-            return productDao.create(product);
-        }
-        catch (Exception ex)
-        {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Unable to create product"
-            );
-        }
+        return productDao.create(product);
     }
 
     // 🔒 UPDATE PRODUCT (ADMIN ONLY)
@@ -104,31 +67,14 @@ public class ProductsController
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateProduct(@PathVariable int id, @RequestBody Product product)
     {
-        try
-        {
-            Product existing = productDao.getById(id);
+        Product existing = productDao.getById(id);
 
-            if (existing == null)
-            {
-                throw new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Product not found"
-                );
-            }
+        if (existing == null)
+        {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
 
-            productDao.update(id, product);
-        }
-        catch (ResponseStatusException ex)
-        {
-            throw ex;
-        }
-        catch (Exception ex)
-        {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Unable to update product"
-            );
-        }
+        productDao.update(id, product);
     }
 
     // 🔒 DELETE PRODUCT (ADMIN ONLY)
@@ -137,30 +83,13 @@ public class ProductsController
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProduct(@PathVariable int id)
     {
-        try
-        {
-            Product existing = productDao.getById(id);
+        Product existing = productDao.getById(id);
 
-            if (existing == null)
-            {
-                throw new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Product not found"
-                );
-            }
+        if (existing == null)
+        {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
 
-            productDao.delete(id);
-        }
-        catch (ResponseStatusException ex)
-        {
-            throw ex;
-        }
-        catch (Exception ex)
-        {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Unable to delete product"
-            );
-        }
+        productDao.delete(id);
     }
 }

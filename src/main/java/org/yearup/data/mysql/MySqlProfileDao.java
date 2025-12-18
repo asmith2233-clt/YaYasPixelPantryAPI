@@ -56,7 +56,7 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
         }
     }
 
-    private Connection getConnection() {
+    public Connection getConnection() {
         return null;
     }
 

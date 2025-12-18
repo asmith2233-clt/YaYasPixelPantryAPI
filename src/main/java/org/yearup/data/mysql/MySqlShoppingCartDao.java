@@ -119,7 +119,7 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
         }
     }
 
-    private Connection getConnection() {
+    public Connection getConnection() {
         return null;
     }
 

@@ -1,6 +1,6 @@
 package org.yearup.data.mysql;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.yearup.data.ProductDao;
 import org.yearup.models.Product;
 
@@ -10,10 +10,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.sql.DriverManager.getConnection;
-
-@Component
-public abstract class MySqlProductDao extends MySqlDaoBase implements ProductDao
+@Repository
+public class MySqlProductDao extends MySqlDaoBase implements ProductDao
 {
     public MySqlProductDao(DataSource dataSource)
     {
@@ -21,13 +19,22 @@ public abstract class MySqlProductDao extends MySqlDaoBase implements ProductDao
     }
 
     @Override
+    public void updateProduct(int userId, int productId, int quantity) {
+
+    }
+
+    @Override
     public void removeProduct(int userId, int productId) {
 
     }
 
-    //  Search / filter (category, minPrice, maxPrice, subCategory)
+    // 🔎 Search / filter (category, minPrice, maxPrice, subcategory)
     @Override
-    public List<Product> search(Integer categoryId, BigDecimal minPrice, BigDecimal maxPrice, String subCategory)
+    public List<Product> search(
+            Integer categoryId,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            String subCategory)
     {
         List<Product> products = new ArrayList<>();
 
@@ -74,7 +81,7 @@ public abstract class MySqlProductDao extends MySqlDaoBase implements ProductDao
         return products;
     }
 
-    //  Used by CategoriesController
+    // Used by CategoriesController
     @Override
     public List<Product> listByCategoryId(int categoryId)
     {
@@ -100,13 +107,6 @@ public abstract class MySqlProductDao extends MySqlDaoBase implements ProductDao
         }
 
         return products;
-    }
-
-    // ✅ Interface-required method (delegate safely)
-    @Override
-    public List<Product> getByCategoryId(int categoryId)
-    {
-        return listByCategoryId(categoryId);
     }
 
     @Override
@@ -220,11 +220,12 @@ public abstract class MySqlProductDao extends MySqlDaoBase implements ProductDao
         }
     }
 
-    private Connection getConnection() {
-        return null;
+    @Override
+    public List<Product> getByCategoryId(int categoryId) {
+        return List.of();
     }
 
-    // ✅ Row mapper
+    // 🔁 Row mapper
     private static Product mapRow(ResultSet row) throws SQLException
     {
         return new Product(
@@ -240,3 +241,4 @@ public abstract class MySqlProductDao extends MySqlDaoBase implements ProductDao
         );
     }
 }
+
