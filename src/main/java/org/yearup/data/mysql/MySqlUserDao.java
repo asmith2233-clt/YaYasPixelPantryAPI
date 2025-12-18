@@ -60,10 +60,6 @@ public class MySqlUserDao extends MySqlDaoBase implements UserDao
         }
     }
 
-    public Connection getConnection() {
-        return null;
-    }
-
     @Override
     public List<User> getAll()
     {
