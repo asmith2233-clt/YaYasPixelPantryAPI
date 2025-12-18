@@ -25,7 +25,7 @@ public abstract class MySqlProductDao extends MySqlDaoBase implements ProductDao
 
     }
 
-    // ✅ Search / filter (category, minPrice, maxPrice, subCategory)
+    //  Search / filter (category, minPrice, maxPrice, subCategory)
     @Override
     public List<Product> search(Integer categoryId, BigDecimal minPrice, BigDecimal maxPrice, String subCategory)
     {
@@ -74,7 +74,7 @@ public abstract class MySqlProductDao extends MySqlDaoBase implements ProductDao
         return products;
     }
 
-    // ✅ Used by CategoriesController
+    //  Used by CategoriesController
     @Override
     public List<Product> listByCategoryId(int categoryId)
     {
